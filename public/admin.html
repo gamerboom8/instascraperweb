@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="card wide">
+        <h1>Admin Control Center</h1>
+        <p>Customize client UI and manage client credentials/credits.</p>
+
+        <h2>Brand Customization</h2>
+        <form id="brandForm" class="grid-two">
+          <label>Brand Name<input id="brandName" required /></label>
+          <label>Theme Color<input id="themeColor" type="color" value="#4f46e5" required /></label>
+          <button type="submit">Apply to all clients</button>
+        </form>
+
+        <h2>Create Client</h2>
+        <form id="createClientForm" class="grid-two">
+          <label>Email<input id="newEmail" type="email" required /></label>
+          <label>Password<input id="newPassword" type="password" required /></label>
+          <label>Starting Credits<input id="newCredits" type="number" min="0" value="10" required /></label>
+          <button type="submit">Create Client</button>
+        </form>
+
+        <h2>Existing Clients</h2>
+        <table>
+          <thead>
+            <tr><th>Email</th><th>Credits</th><th>Set Credits</th><th>Reset Password</th></tr>
+          </thead>
+          <tbody id="clientsTable"></tbody>
+        </table>
+
+        <p id="adminMessage" class="message"></p>
+        <div class="row">
+          <button id="backBtn" class="secondary" type="button">Back to Dashboard</button>
+          <button id="logoutBtn" class="secondary" type="button">Logout</button>
+        </div>
+      </section>
+    </main>
+    <script src="admin.js"></script>
+  </body>
+</html>

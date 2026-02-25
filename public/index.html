@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ScrapeForge | Login</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="card">
+        <h1>Welcome to <span id="brandTitle">ScrapeForge</span></h1>
+        <p>Log in to run social scraping tools with credit-based usage.</p>
+        <form id="loginForm">
+          <label>Email<input type="email" id="email" required /></label>
+          <label>Password<input type="password" id="password" required /></label>
+          <button type="submit">Login</button>
+        </form>
+        <p id="message" class="message"></p>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
