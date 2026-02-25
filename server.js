@@ -63,6 +63,16 @@ const adminOnly = (req, res, next) => {
   return next();
 };
 
+
+app.get('/health', async (_req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    return res.status(200).json({ status: 'ok' });
+  } catch (error) {
+    return res.status(503).json({ status: 'error' });
+  }
+});
+
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
