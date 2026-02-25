@@ -61,6 +61,7 @@ Add these variables in EasyPanel:
 - `JWT_SECRET=<strong-random-secret>`
 - `ADMIN_EMAIL=<your-admin-email>`
 - `ADMIN_PASSWORD=<your-initial-admin-password>`
+- `TEST_MODE=false`
 
 ### 4) Run DB initialization once
 
@@ -86,3 +87,26 @@ Set EasyPanel health check path to:
 - Auth uses JWT bearer tokens.
 - The scrape endpoint is simulated and decrements credits.
 - If you rotate `ADMIN_PASSWORD`, re-run `npm run init-db` to update the admin hash.
+
+
+## Test mode (start without database)
+
+If you want the app process to boot without PostgreSQL (for UI smoke tests / container checks), set:
+
+```text
+TEST_MODE=true
+```
+
+With `TEST_MODE=true` and no `DATABASE_URL`, the server starts and `/health` returns healthy with database disabled.
+Database-backed routes (`/api/*`) will return `503` until you provide a real `DATABASE_URL`.
+
+## Can I point to a brand new PostgreSQL database?
+
+Yes. You can switch `DATABASE_URL` to any new PostgreSQL instance.
+After pointing to the new database, run:
+
+```bash
+npm run init-db
+```
+
+That command creates the required `users` table (if missing) and seeds/updates the admin account.

@@ -8,18 +8,30 @@ const jwt = require('jsonwebtoken');
 const app = express();
 const port = Number(process.env.PORT || 3000);
 const jwtSecret = process.env.JWT_SECRET;
+const isTestMode = process.env.TEST_MODE === 'true';
+const databaseUrl = process.env.DATABASE_URL;
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL is required');
-}
 if (!jwtSecret) {
   throw new Error('JWT_SECRET is required');
 }
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+if (!databaseUrl && !isTestMode) {
+  throw new Error('DATABASE_URL is required unless TEST_MODE=true');
+}
+
+const pool = databaseUrl ? new Pool({ connectionString: databaseUrl }) : null;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+const requireDatabase = (res) => {
+  if (!pool) {
+    res.status(503).json({ error: 'Database is disabled in TEST_MODE (set DATABASE_URL to enable persistence)' });
+    return false;
+  }
+  return true;
+};
 
 const toPublicUser = (row) => ({
   id: row.id,
@@ -31,6 +43,9 @@ const toPublicUser = (row) => ({
 });
 
 const authRequired = async (req, res, next) => {
+  if (!requireDatabase(res)) {
+    return;
+  }
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Unauthorized' });
@@ -65,15 +80,22 @@ const adminOnly = (req, res, next) => {
 
 
 app.get('/health', async (_req, res) => {
+  if (!pool) {
+    return res.status(200).json({ status: 'ok', mode: 'test', database: 'disabled' });
+  }
+
   try {
     await pool.query('SELECT 1');
-    return res.status(200).json({ status: 'ok' });
+    return res.status(200).json({ status: 'ok', mode: isTestMode ? 'test' : 'production', database: 'connected' });
   } catch (error) {
-    return res.status(503).json({ status: 'error' });
+    return res.status(503).json({ status: 'error', database: 'unreachable' });
   }
 });
 
 app.post('/api/login', async (req, res) => {
+  if (!requireDatabase(res)) {
+    return;
+  }
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -100,6 +122,9 @@ app.get('/api/me', authRequired, (req, res) => {
 });
 
 app.post('/api/scrape', authRequired, async (req, res) => {
+  if (!requireDatabase(res)) {
+    return;
+  }
   const { creditsToUse = 1, tool = 'Generic Scraper' } = req.body;
 
   const creditsCost = Number(creditsToUse);
@@ -129,6 +154,9 @@ app.post('/api/scrape', authRequired, async (req, res) => {
 });
 
 app.get('/api/admin/settings', authRequired, adminOnly, async (_req, res) => {
+  if (!requireDatabase(res)) {
+    return;
+  }
   const { rows } = await pool.query(
     `
       SELECT id, email, role, credits, theme_color, brand_name, created_at
@@ -141,6 +169,9 @@ app.get('/api/admin/settings', authRequired, adminOnly, async (_req, res) => {
 });
 
 app.patch('/api/admin/settings', authRequired, adminOnly, async (req, res) => {
+  if (!requireDatabase(res)) {
+    return;
+  }
   const { themeColor, brandName } = req.body;
 
   if (!themeColor || !brandName) {
@@ -160,6 +191,9 @@ app.patch('/api/admin/settings', authRequired, adminOnly, async (req, res) => {
 });
 
 app.post('/api/admin/clients', authRequired, adminOnly, async (req, res) => {
+  if (!requireDatabase(res)) {
+    return;
+  }
   const { email, password, credits = 0 } = req.body;
 
   if (!email || !password) {
@@ -180,6 +214,9 @@ app.post('/api/admin/clients', authRequired, adminOnly, async (req, res) => {
 });
 
 app.patch('/api/admin/clients/:id', authRequired, adminOnly, async (req, res) => {
+  if (!requireDatabase(res)) {
+    return;
+  }
   const { id } = req.params;
   const { password, credits } = req.body;
 
