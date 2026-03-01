@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Client Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="card wide">
+        <h1 id="dashBrand">ScrapeForge</h1>
+        <p id="userLine"></p>
+        <p><strong>Available credits:</strong> <span id="credits">0</span></p>
+
+        <form id="scrapeForm" class="grid-two">
+          <label>Tool Name<input type="text" id="tool" value="Smart Contact Crawler" required /></label>
+          <label>Credits to consume<input type="number" id="creditsToUse" min="1" value="1" required /></label>
+          <label>Primary URL<input type="url" id="targetUrl" placeholder="https://example.com" required /></label>
+          <label>Max pages per URL<input type="number" id="maxPages" min="1" max="25" value="8" required /></label>
+          <label class="full">Extra URLs (optional, one per line)
+            <textarea id="targetUrls" rows="4" placeholder="https://example.com/contact\nhttps://example.com/contato"></textarea>
+          </label>
+          <button type="submit">Run Crawl</button>
+        </form>
+
+        <p id="dashMessage" class="message"></p>
+
+        <h2>JSON Sent to API</h2>
+        <table>
+          <thead>
+            <tr><th>Field</th><th>Value</th></tr>
+          </thead>
+          <tbody id="payloadTable"></tbody>
+        </table>
+
+        <h2>Visited Pages</h2>
+        <table>
+          <thead>
+            <tr><th>URL</th><th>Status</th><th>Title</th></tr>
+          </thead>
+          <tbody id="pagesTable"></tbody>
+        </table>
+
+        <h2>Crawler Findings</h2>
+        <table>
+          <thead>
+            <tr><th>Page</th><th>Element</th><th>Text</th><th>Matched phrases</th><th>Target</th></tr>
+          </thead>
+          <tbody id="matchesTable"></tbody>
+        </table>
+
+        <div class="row">
+          <button id="adminBtn" class="secondary" type="button">Go to Admin Page</button>
+          <button id="logoutBtn" class="secondary" type="button">Logout</button>
+        </div>
+      </section>
+    </main>
+    <script src="dashboard.js"></script>
+  </body>
+</html>
